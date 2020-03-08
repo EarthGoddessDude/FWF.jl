@@ -24,8 +24,8 @@ function Base.show(io::IO, f::Source)
     show(io, f.schema)
 end
 
-function union_missing(m::Bool, t::Type) 
-    m ? (Union{t, Missing}) : (t)  
+function union_missing(m::Bool, t::Type)
+    m ? (Union{t, Missing}) : (t)
 end
 
 # Negative values will break these functions
@@ -46,11 +46,7 @@ end
 
 
 function calculate_ranges(columnwidths::Union{Vector{UnitRange{Int}}, Vector{Int}})
-    @static if VERSION < v"0.7.0-DEV"
-        rangewidths = Vector{UnitRange{Int}}(length(columnwidths))
-    else
-        rangewidths = Vector{UnitRange{Int}}(uninitialized, length(columnwidths))
-    end
+    rangewidths = Vector{UnitRange{Int}}(undef, length(columnwidths))
     if isa(columnwidths, Vector{Int})
         l = 0
         for i in eachindex(columnwidths)
@@ -101,7 +97,7 @@ function Source(
     malformed = false
 
     isa(fullpath, AbstractString) && (isfile(fullpath) || throw(ArgumentError("\"$fullpath\" is not a valid file")))
-    
+
     # open the file and prepare for procesing
     if isa(fullpath, IOBuffer)
         source = fullpath
@@ -169,12 +165,12 @@ function Source(
         # number columns
         headerlist = ["Column$i" for i = 1:columns]
     elseif !isempty(header)
-        length(header) != columns && (throw(ArgumentError("Header count doesn't match column count"))) 
+        length(header) != columns && (throw(ArgumentError("Header count doesn't match column count")))
         headerlist = copy(header)
     else
-        throw(ArgumentError("Can not determine headers")) 
+        throw(ArgumentError("Can not determine headers"))
     end
-    
+
     # Type is set to String if types are not passed in
     # Otherwise iterate through copying types & creating date dictionary
     if isempty(types)
@@ -194,7 +190,7 @@ function Source(
                 !(types[i] in (Int, Float64, String, Missing)) && (throw(ArgumentError("Invalid Type: "*string(types[i]))))
                 isa(types[i], Missing) ? Missing : typelist[i] = union_missing(usemissings, types[i])
             else
-               throw(ArgumentError("Found type that is not a DateFormat or DataType")) 
+               throw(ArgumentError("Found type that is not a DateFormat or DataType"))
             end
         end
     end
@@ -203,7 +199,7 @@ function Source(
     missingset=Set{String}(missings)
 
     sch = Data.Schema(typelist, headerlist, ifelse(rows ≤ 0, missing, rows))
-    opt = Options(usemissings=usemissings, trimstrings=trimstrings, 
+    opt = Options(usemissings=usemissings, trimstrings=trimstrings,
                     errorlevel=errorlevel, unitbytes=unitbytes, skip=skip, missingvals=missingset,
                     dateformats = datedict,
                     columnrange=rangewidths)
