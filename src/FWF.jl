@@ -1,13 +1,7 @@
 __precompile__(true)
 module FWF
 
-@static if VERSION < v"0.7.0-DEV.2005"
-    using DataStreams, Missings, DataFrames
-else 
-    using DataStreams, Missings, DataFrames, Dates, Mmap
-end
-
-
+using DataStreams, Missings, DataFrames, Dates, Mmap
 
 struct ParsingException <: Exception
     msg::String
@@ -22,7 +16,7 @@ Configuration Settings for fixed width file parsing.
   * `errorlevel`  : if `:parse` then as much as possible is parsed and missing data is replaced by `missing`;
                     if `:skip` then malformed line is skipped on error;
                     if `:error` then an exception is thrown on error; default `:parse`
-  * `countnybytes`: true if field parsing should happen by bytes, false for character based parsing; default `true` 
+  * `countnybytes`: true if field parsing should happen by bytes, false for character based parsing; default `true`
   * `missingvals` : Set{String} for values that equal missing
   * `dateformats` : Dictionary in the form of Int=>DateFormat to specify date formats for a column
   * `columnrange` : Vector of UnitRanges that specifcy the widths of each column.
