@@ -90,7 +90,7 @@ function Source(
     header::Union{Bool, Vector{String}}=Vector{String}(),
     missings::Vector{String}=Vector{String}()
     )
-    # Appemtping to re-create all objects here to minimize outside tampering
+    # Attempting to re-create all objects here to minimize outside tampering
     datedict = Dict{Int, DateFormat}()
     typelist = Vector{DataType}()
     rangewidths = Vector{UnitRange{Int}}()
