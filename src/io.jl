@@ -10,7 +10,7 @@ function row_countlines(io::IO)
     rows = 0
     # EOL detection, if we don't have an EoL doesn't matter
     start_pos = position(io)
-    line = readline(io, chomp=false)
+    line = readline(io, keep=false)
     eolpad = (eof(io) || length(line) < 2 || (line[end-1] != '\r')) ? 0 : 1
     seek(io, start_pos)
     rows = mod_countlines(io)
@@ -18,7 +18,7 @@ function row_countlines(io::IO)
 end
 
 # version of countlines() that checks last line for non-empty.
-function mod_countlines(io::IO) 
+function mod_countlines(io::IO)
     b=[UInt8(0)]::Vector{UInt8}
     eof(io) && return 0
     l = countlines(io)
@@ -62,9 +62,9 @@ function readsplitline!(vals::Vector{Union{Missing,String}}, io::IO, columnwidth
     # Parameter validation
     ((columnwidths == nothing) || (isempty(columnwidths))) && throw(ArgumentError("No column widths provided"))
     eof(io) && (throw(ArgumentError("IO not available")))
-    
+
     our_length = unitbytes ? sizeof : length
-    
+
     rowlength = last(last(columnwidths))
     # Read a line and validate
     test = true
@@ -159,7 +159,7 @@ Keyword Arguments:
 * `rows::Int`: maximum number of rows to read from file; default = 0 (whole file)
 * `types`: a vector of how to parse each column. (String, Int, Float64, Missing) are valid types, missing will convert whole comumn to `missing`. Pass in the format for Date columns as DateFormat("")
             example: [String, Int, DateFormat("mmddyyyy")]
-* `header`: column names can be provided as a Vector{String} or parameter can be set to `true` to use the first row as values or `false` to auto-generate names 
+* `header`: column names can be provided as a Vector{String} or parameter can be set to `true` to use the first row as values or `false` to auto-generate names
 * `missings`: a Vector{String} that represents all values that should be converted to missing; example: ["***", "NA", "NULL", "####"]
 * `append::Bool=false`: if the `sink` argument provided is an existing table, `append=true` will append the source's data to the existing data instead of doing a full replace
 * `transforms::Dict{Union{String,Int},Function}`: a Dict of transforms to apply to values as they are parsed. Note that a column can be specified by either number or column name.
@@ -195,8 +195,8 @@ julia> strrep(s::String, r::UnitRange) = [repeat(s, n) for n in r]
 julia> naValues = vcat(strrep("*", 1:23), strrep("#", 1:23), "NAME WITHHELD BY AGENCY", "NAME WITHHELD BY OPM", "NAME UNKNOWN", "UNSP", "<NA>", "000000", "999999", "")
 
 
-julia> dt = FWF.read("sal.txt", convert(Array{Int},format[:x2]), 
-        header=convert(Array{String}, format[:x1]), types=convert(Array{Union{Type, DateFormat}},format[:x3]), 
+julia> dt = FWF.read("sal.txt", convert(Array{Int},format[:x2]),
+        header=convert(Array{String}, format[:x1]), types=convert(Array{Union{Type, DateFormat}},format[:x3]),
         missings=naValues)
 200000×18 DataFrames.DataFrame. Omitted printing of 8 columns
 │ Row    │ PSEUDO-ID │ EMPLOYEE_NAME │ FILE_DATE  │ AGENCY │ SUB_AGENCY │ DUTY_STATION │ AGE   │ EDUCATION_LEVEL │ PAY_PLAN │ GRADE │
