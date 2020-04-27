@@ -1,3 +1,7 @@
+using FWF
+using Dates
+using Test
+
 # Test items in FWF.jl file
 
 # Ensure options objects get created
